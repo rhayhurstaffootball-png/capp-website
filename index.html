@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAPP — Video Coordinator Suite</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #070a0f;
+      --surface:   #0d1117;
+      --card:      #111825;
+      --border:    rgba(255,255,255,0.07);
+      --text:      #e8edf5;
+      --muted:     #8b96a8;
+      --blue:      #3a7ebf;
+      --blue-glow: rgba(58,126,191,0.25);
+      --green:     #22c55e;
+      --purple:    #a855f7;
+      --yellow:    #eab308;
+      --orange:    #f97316;
+      --teal:      #06b6d4;
+      --red:       #ef4444;
+      --pink:      #ec4899;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,10,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-logo img {
+      height: 32px;
+      width: auto;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding: 8rem 2rem 6rem;
+    }
+
+    /* Subtle grid overlay */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(58,126,191,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(58,126,191,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* Blue glow under logo */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(58,126,191,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-logo {
+      position: relative;
+      z-index: 1;
+      height: 90px;
+      width: auto;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 0 24px rgba(58,126,191,0.5));
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      line-height: 1.15;
+    }
+
+    .hero h1 span {
+      color: var(--blue);
+    }
+
+    .hero-sub {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-badges {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border: 1px solid;
+      text-transform: uppercase;
+    }
+
+    .badge-blue   { color: var(--blue);   border-color: rgba(58,126,191,0.4);  background: rgba(58,126,191,0.08); }
+    .badge-green  { color: var(--green);  border-color: rgba(34,197,94,0.4);   background: rgba(34,197,94,0.08); }
+    .badge-purple { color: var(--purple); border-color: rgba(168,85,247,0.4);  background: rgba(168,85,247,0.08); }
+
+    /* ── SECTION WRAPPER ── */
+    .section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 3vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-desc {
+      text-align: center;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 3.5rem;
+      font-size: 1rem;
+    }
+
+    /* ── MODULE CARDS ── */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 900px) {
+      .modules-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 580px) {
+      .modules-grid { grid-template-columns: 1fr; }
+    }
+
+    .module-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem 1.5rem 1.5rem 1.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .module-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    /* Colored left accent bar */
+    .module-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 16px; bottom: 16px;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: var(--accent-color, var(--blue));
+    }
+
+    /* Subtle top gradient shimmer */
+    .module-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-color, var(--blue)), transparent);
+      opacity: 0.4;
+    }
+
+    .module-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .module-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    .module-card p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── SCREENSHOTS ── */
+    .screenshots-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .screenshots-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .screenshot-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .screenshot-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+
+    .screenshot-card.featured {
+      grid-column: span 2;
+    }
+
+    .screenshot-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .screenshot-caption {
+      padding: 0.875rem 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .screenshot-caption h4 {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .screenshot-caption p {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--blue);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 6rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse, rgba(58,126,191,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-section h2 {
+      position: relative;
+      font-size: clamp(1.6rem, 3vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      position: relative;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .cta-email {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--blue);
+      color: white;
+      text-decoration: none;
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(58,126,191,0.35);
+    }
+
+    .cta-email:hover {
+      background: #4a8ecf;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(58,126,191,0.5);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      .screenshots-grid { grid-template-columns: 1fr; }
+      .screenshot-card.featured { grid-column: span 1; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="capplogo.png" alt="CAPP" />
+  </div>
+  <ul class="nav-links">
+    <li><a href="#modules">Modules</a></li>
+    <li><a href="#screenshots">Screenshots</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <img class="hero-logo" src="capplogo.png" alt="CAPP" />
+  <h1>The <span>Video Coordinator</span> Suite</h1>
+  <p class="hero-sub">
+    Purpose-built tools for college and NFL video staff —
+    live scoreboard entry, workflow tracking, film management, and more.
+  </p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">&#9679; College Football</span>
+    <span class="badge badge-green">&#9679; NFL</span>
+    <span class="badge badge-purple">&#9679; Live Play-by-Play</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="section" style="padding-top: 0; padding-bottom: 4rem;">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-number">11+</div>
+      <div class="stat-label">Integrated Modules</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">99%</div>
+      <div class="stat-label">Scoreboard Accuracy</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">2</div>
+      <div class="stat-label">Seats Per License</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">Live</div>
+      <div class="stat-label">Real-Time Feed</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULES -->
+<section class="screenshots-section" id="modules">
+  <div class="section">
+    <p class="section-label">What's Included</p>
+    <h2 class="section-title">Every Tool You Need</h2>
+    <p class="section-desc">
+      CAPP is a complete toolkit for Video Coordinators at all levels of football. Every module was built for the pace and precision needed on a daily basis.
+    </p>
+
+    <div class="modules-grid">
+
+      <div class="module-card" style="--accent-color: #3a7ebf;">
+
+        <h3>Live Scoreboard Entry</h3>
+        <p>Pulls live play-by-play data for CFB and NFL. Auto-fills down, distance, clock, score, and yard line — play by play, in real time.</p>
+      </div>
+
+      <div class="module-card" style="--accent-color: #ec4899;">
+
+        <h3>Voice Entry</h3>
+        <p>Whisper-powered speech recognition for hands-free scoreboard entry. Understands football vocabulary — down, distance, play type, clock — spoken naturally.</p>
+      </div>
+
+      <div class="module-card" style="--accent-color: #22c55e;">
+
+        <h3>Scoreboard Editor</h3>
+        <p>Drag-and-drop layout designer with 18 configurable elements. Build once, reuse every game.</p>
+      </div>
+
+      <div class="module-card" style="--accent-color: #a855f7;">
+
+        <h3>Scoreboard Generator</h3>
+        <p>Renders a 3-second MP4 scoreboard video per play compatible with all major editing systems.</p>
+      </div>
+
+      <div class="module-card" style="--accent-color: #22c55e;">
+
+        <h3>Workflow Manager</h3>
+        <p>Track OFFENSE, DEFENSE, KICKS, and PFF for every opponent on your schedule. WIN/LOSS records, coordinator games, and per-team notes — all in one view.</p>
+      </div>
+
+      <div class="module-card" style="--accent-color: #06b6d4;">
+
+        <h3>Clip Splitter <span style="font-size:0.7rem; color:var(--muted); font-weight:500; text-transform:none; letter-spacing:0;">(Beta)</span></h3>
+        <p>Auto-detects scene breaks in your film using motion energy analysis. Converts to a friendly format compatible with all major editing platforms.</p>
+      </div>
+
+      <div class="module-card" style="--accent-color: #eab308;">
+
+        <h3>Camera Card Tool</h3>
+        <p>Format SD cards in mass for any camera or recorder configuration. Detects card errors, supports multiple formats, and logs every operation for full accountability.</p>
+      </div>
+
+      <div class="module-card" style="--accent-color: #f97316;">
+
+        <h3>File Distribution</h3>
+        <p>Parallel multi-drive copy with live progress per destination. Built for post-game duplication of full film packages.</p>
+      </div>
+
+<div class="module-card" style="--accent-color: #3a7ebf;">
+
+        <h3>Data Converter</h3>
+        <p>Conversion of play data from any source into CAPP formats to generate video scoreboards.</p>
+      </div>
+
+      <div class="module-card" style="--accent-color: #7c3aed; grid-column: 2;">
+
+        <h3>CAPP Nodes</h3>
+        <p>Remote access to any registered machine — live screen share built directly into the launcher. No open ports, no third-party software. Coordinates and GAs stay connected from anywhere.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section id="screenshots">
+  <div class="section">
+    <p class="section-label">See It In Action</p>
+    <h2 class="section-title">Built for Practice and Game Day</h2>
+    <p class="section-desc">
+      Every screen is designed for low-light booths, fast entries, and zero margin for error.
+    </p>
+
+    <div class="screenshots-grid">
+
+      <div class="screenshot-card featured">
+        <img src="screenshots/SCREENSHOT 1.jpg" alt="CAPP Launcher with Live Game Selector" loading="lazy" />
+        <div class="screenshot-caption">
+          <h4>Launcher + Live Game Selector</h4>
+          <p>Select any live CFB or NFL game and enter live mode in seconds. All modules accessible from a single hub.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <img src="screenshots/SCREENSHOT 2.jpg" alt="Scoreboard Entry — Live Mode" loading="lazy" />
+        <div class="screenshot-caption">
+          <h4>Scoreboard Entry — Live Mode</h4>
+          <p>Full 15-column treeview showing every play with down, distance, clock, score, and QC status. Supports live feed, manual entry, and voice entry.</p>
+        </div>
+      </div>
+
+      <div class="screenshot-card">
+        <img src="screenshots/SCREENSHOT 4.jpg" alt="Workflow Manager" loading="lazy" />
+        <div class="screenshot-caption">
+          <h4>Workflow Manager</h4>
+          <p>Per-opponent OFFENSE, DEFENSE, KICKS, and PFF tracking — shared across both seats in real time.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <h2>Ready to Run CAPP?</h2>
+  <p>
+    CAPP is currently in development and on track for the 2026 season.
+    Reach out if you'd like to learn more or stay informed when it's available.
+  </p>
+  <a class="cta-email" href="mailto:roger@cappvcs.com">
+    &#9993; &nbsp;Contact Us
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 CAPP Video Coordinator Suite &nbsp;|&nbsp; <a href="https://cappvcs.com">cappvcs.com</a></p>
+</footer>
+
+</body>
+</html>
